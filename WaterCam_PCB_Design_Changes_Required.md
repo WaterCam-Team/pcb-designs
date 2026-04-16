@@ -101,13 +101,52 @@ GPIO12 and GPIO13 are alternate-function pins:
 
 **Problem:** The modified IR CUT camera requires GPIO control for its filter. No connector or control circuit exists in the current design.
 
-**Action:** Add a 4-pin JST-PH or 2.54mm THT connector (J4) for IR CUT camera:
-- Pin 1: 5V or 3.3V (camera power if needed)
-- Pin 2: GPIO_IRCUT_A → GPIO22 (Pi pin 15, currently free)
-- Pin 3: GPIO_IRCUT_B → GPIO27 (Pi pin 13, currently free) [for H-bridge control; use single GPIO if relay-based]
-- Pin 4: GND
+**How the IR CUT control mechanism works:**
 
-If the camera uses a simple relay: use GPIO22 only (single pole). If it uses a bipolar drive coil (common in IR-CUT cams): use GPIO22 + GPIO27 with a mini H-bridge (DRV8833 or similar) or two N-MOSFETs.
+The Dorhea IR CUT camera module contains an internal IR CUT controller IC that drives the filter motor.  The controller decides which filter position to use by reading a photoresistor (LDR) voltage divider:
+
+- LDR high resistance (dark scene) → divider node voltage high → controller switches to night mode (removes IR cut filter)
+- LDR low resistance (bright scene) → divider node voltage low → controller switches to day mode (inserts IR cut filter)
+
+The modification for Pi control removes the LDR and connects the divider node to a Pi GPIO.
+
+**Why direct GPIO connection is unreliable:**
+
+The GPIO is a low-impedance voltage source.  When it drives HIGH into the LDR divider node, the fixed pull-down resistor in the divider loads the pin below the Pi's logic HIGH threshold (~1.6 V).  In testing, `GPIO.input()` read 0 in both HIGH and LOW states even though the motor did move — because the camera comparator threshold is lower than the Pi's logic threshold, and the voltage swing at the node (0 V to ~1 V) was enough for the camera but not enough for the Pi to read back.  This margin is unreliable across temperature, supply voltage variation, and camera module tolerances.
+
+**Correct PCB circuit: NPN transistor open-collector switch**
+
+Replace the direct wire with an NPN transistor (2N3904 or BSS138 SOT-23) to present the high/low impedance the camera comparator was designed for:
+
+```
+GPIO22 ──[R1: 1 kΩ]── Base
+                       Collector ── LDR node (camera connector pin)
+                       Emitter  ── GND
+
+R2: 10 kΩ from Base to GND  (ensures transistor is off when GPIO floats at boot)
+```
+
+- GPIO22 LOW → transistor off → node floats up through camera's internal pull-up → controller sees "dark" → night mode (IR cut filter removed)
+- GPIO22 HIGH → transistor saturates, ~10–50 Ω collector-emitter → node pulled to GND → controller sees "bright" → day mode (IR cut filter inserted)
+
+The transistor presents the same impedance characteristic the comparator expects, regardless of GPIO drive strength.
+
+**Action:** Add the following to the schematic and PCB:
+
+1. Connector J4 — 3-pin JST-PH or 2.54mm THT:
+   - Pin 1: LDR node signal (to camera photoresistor pin)
+   - Pin 2: GND (to camera photoresistor GND reference)
+   - Pin 3: Camera 5V power (if powering camera from board; otherwise NC)
+
+2. Transistor Q2 — 2N3904 or BSS138 (SOT-23):
+   - Collector → J4 pin 1 (LDR node)
+   - Emitter → GND
+   - Base → R1
+
+3. R1 = 1 kΩ (0402) — GPIO22 to Q2 base
+4. R2 = 10 kΩ (0402) — Q2 base to GND (pull-down, prevents floating gate at boot)
+
+GPIO22 (Pi pin 15) is used — one GPIO only.  GPIO27 is not needed and remains free.
 
 ---
 
@@ -273,11 +312,11 @@ No address conflicts in default configuration.
 | GPIO14/TXD0 | 8 | (free — UART0/BT by default) | NC |
 | GPIO15/RXD0 | 10 | (free — UART0/BT by default) | NC |
 | GPIO17 | 11 | SYS_UP | WittyPi (DO NOT USE) |
-| GPIO22 | 15 | IR CUT Filter A | J4 (new connector) |
+| GPIO22 | 15 | IR CUT filter control (Q2 base via R1) | J4 (new connector) |
 | GPIO24 | 18 | Lepton J2-P15 (GPIO2/VSYNC) | J2 |
 | GPIO25 | 22 | Lepton PW_DWN_L | J2-P18 (optional) |
 | GPIO26 | 37 | mDot nReset (optional) | U3 pin 5 |
-| GPIO27 | 13 | IR CUT Filter B (H-bridge) | J4 (if bipolar) |
+| GPIO27 | 13 | (free) | NC |
 | mDot PB_1 (pad 19) | — | WittyPi SW trigger | Q1 gate |
 | GPIO5 | 29 | mDot PA_6/MISO (original) | Review needed |
 | ID_SDA | 27 | HAT EEPROM SDA | U4 (new) |
