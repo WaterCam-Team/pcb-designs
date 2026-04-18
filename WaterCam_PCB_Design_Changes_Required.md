@@ -1,15 +1,41 @@
 # WaterCam PCB HAT — Design Changes Required
 
-**Prepared:** 2026-03-26
-**Board version analyzed:** WaterCam_v6.0_OFM
-**KiCad file:** `WaterCam_mDot_WittyPi_AHT_BNO_Lepton.kicad_sch` / `.kicad_pcb`
+**Prepared:** 2026-03-26  
+**Last updated:** 2026-04-18  
+**Board version analyzed:** WaterCam_v6.0_OFM  
+**Current schematic:** WaterCam_mDot_WittyPi_AHT_BNO_Lepton.kicad_sch (v7, fixes applied)  
 **Stack:** Raspberry Pi 4B → WittyPi 4 (40-pin stacking HAT) → This PCB (on top via stacking header)
+
+---
+
+## Issue Status Summary
+
+| # | Issue | Priority | Status |
+|---|-------|----------|--------|
+| 1 | J2 connector pinout wrong | Critical | ✅ Fixed in schematic |
+| 2 | GPIO17 conflict (WittyPi SYS_UP) | Critical | ✅ Fixed — J2-P15 → GPIO24 |
+| 3 | mDot UART connection | Critical | ✅ Was already correct |
+| 4 | mDot antenna connection | Critical | ✅ N/A — mDot has built-in u.FL |
+| 5 | IR-CUT camera GPIO circuit | High | ⏸ Deferred — circuit is external to HAT PCB |
+| 6 | WittyPi CATH/VOUT unconnected | High | ⏸ Deferred — not needed for current use case |
+| 7 | HAT EEPROM missing | High | ⏸ N/A — EEPROM not needed on this board |
+| 8 | No decoupling capacitors | High | ⚠️ Open — PCB layout change needed |
+| 9 | No I2C pull-up resistors | High | ⚠️ Open — PCB layout change needed |
+| 10 | BNO055/085 ambiguity + INT/RST | Medium | ✅ Fixed — BNO055 confirmed; INT→GPIO20, RST→GPIO16 |
+| 11 | Q1 MOSFET oversized | Medium | ⚠️ Open — functional but inefficient |
+| 12 | Stacking header height | Medium | ⚠️ Open — BOM note only; verify before fab |
+| 13 | mDot duplicate pad "24" | Medium | ⚠️ Open — footprint edit needed |
+| 14 | Q1 gate resistor missing | Medium | ⚠️ Open — add R8 100Ω |
+| 15 | mDot VDD decoupling | Low | ⚠️ Open — same as #8 |
+| 16 | mDot nReset unconnected | Low | ⚠️ Open — tie HIGH or connect GPIO26 |
+| 17 | Lepton PW_DWN_L unconnected | Low | ✅ Fixed — P18 tied to +3.3V |
+| 18 | Board-level 3.3V rail | Low | ⚠️ Open — deferred |
 
 ---
 
 ## Critical — Hardware Will Not Function Without These Fixes
 
-### 1. FLIR Lepton Breakout v2 (J2) Connector Pinout Is Wrong
+### 1. ~~FLIR Lepton Breakout v2 (J2) Connector Pinout Is Wrong~~ — FIXED
 
 **Problem:** The J2 connector (FLIR Lepton Breakout Board v2 host interface, 2×10 20-pin) has signals assigned to wrong pins. Almost all SPI and I2C connections are misrouted.
 
@@ -63,7 +89,7 @@
 
 > **Note:** Verify the P2 power connection against physical board. The schematic shows P2 as an internal VCC28 (2.8V) net which may be an output; the correct host connection is VIN (5V) input. Current design has +5V → P2 which appears correct based on the breakout's power circuit topology.
 
-### 2. GPIO17 Conflict — WittyPi SYS_UP vs Lepton
+### 2. ~~GPIO17 Conflict — WittyPi SYS_UP vs Lepton~~ — FIXED
 
 **Problem:** GPIO17 is claimed by WittyPi 4. It is the SYS_UP signal that the Pi writes HIGH when running (WittyPi reads this). The current schematic also routes GPIO17 to J2-P15 (a Lepton GPIO output pin). This creates a bus conflict: Pi driving GPIO17 HIGH (SYS_UP) while Lepton may be driving J2-P15 as output → **potential damage**.
 
@@ -91,11 +117,9 @@ GPIO12 and GPIO13 are alternate-function pins:
 
 > **Note:** GPIO14/GPIO15 (UART0) remain free. UART0 maps to the Bluetooth controller by default on Pi 4B; no conflict with mDot on UART5.
 
-### 4. mDot Has No Antenna Connection
+### 4. ~~mDot Has No Antenna Connection~~ — N/A
 
-**Problem:** No u.FL connector, antenna footprint, or RF trace is present for the mDot LoRa antenna output. Without an antenna, the mDot cannot transmit or receive LoRa signals and may be damaged at high TX power.
-
-**Action:** Add a u.FL SMD connector (e.g., Hirose U.FL-R-SMT-1) on the PCB connected to the mDot RF pad (bottom pad on the castellated module). Add a 5mm copper keepout zone around the antenna connector. The mDot RF pad is on the bottom/underside of the module footprint.
+**Resolution:** The Multitech MTDOT-915 module includes a built-in u.FL connector on the module itself. No separate antenna footprint is needed on the HAT PCB. Connect an external antenna directly to the mDot's u.FL port. Maintain a 5mm copper keepout zone on the HAT PCB in the area directly above/below the mDot module to avoid detuning the antenna.
 
 ### 5. Missing IR CUT Camera GPIO Control Circuit
 
@@ -178,21 +202,9 @@ GPIO22 (Pi pin 15) is used — one GPIO only.  GPIO27 is not needed and remains 
 - J3-ALM (pin 4): Connect to a free Pi GPIO if alarm detection is needed (e.g., GPIO26)
 - J3-LED (pin 3): Leave NC or connect to GPIO via 1K resistor for status LED
 
-### 7. HAT EEPROM Missing
+### 7. ~~HAT EEPROM Missing~~ — N/A
 
-**Problem:** The Raspberry Pi HAT specification requires a CAT24C256 (or 24C32) I2C EEPROM on ID_SDA/ID_SCL (Pi pins 27/28, GPIO0/GPIO1). This EEPROM identifies the HAT to the Pi. The ID_SDA and ID_SCL nets exist in the schematic but connect to nothing.
-
-**Action:** Add U4 — CAT24C256WI EEPROM (or 24AA32A), 8-pin SOIC-8:
-- Pin 1 (A0): GND
-- Pin 2 (A1): GND
-- Pin 3 (A2): GND (I2C address = 0x50)
-- Pin 4 (GND): GND
-- Pin 5 (SDA): ID_SDA (Pi pin 27)
-- Pin 6 (SCL): ID_SCL (Pi pin 28)
-- Pin 7 (WP): GND (or via solder jumper JP1 to 3.3V to write-protect)
-- Pin 8 (VCC): 3.3V
-
-Add R4 = 3.9kΩ pull-up on ID_SDA and R5 = 3.9kΩ pull-up on ID_SCL to 3.3V.
+**Decision:** EEPROM not needed on this board. HAT EEPROM is optional per Pi spec; required only for automatic device-tree overlay loading by the Pi firmware. This board loads its overlays manually via `/boot/firmware/config.txt`. GPIO0/GPIO1 (ID_SDA/ID_SCL) remain unconnected. U4, R4, R5 should be removed from schematic.
 
 ### 8. No Decoupling Capacitors
 
@@ -217,14 +229,11 @@ Add R4 = 3.9kΩ pull-up on ID_SDA and R5 = 3.9kΩ pull-up on ID_SCL to 3.3V.
 
 ## Medium Priority — Improvements
 
-### 10. BNO055 vs BNO085 Ambiguity
+### 10. ~~BNO055 vs BNO085 Ambiguity~~ — FIXED
 
 **Problem:** The schematic and PCB show the Adafruit BNO055 STEMMA QT breakout (U2), but the project description mentions BNO085. These are different physically (different Adafruit board ID, different I2C register sets).
 
-**Current:** BNO055 Adafruit breakout (I2C address 0x28 or 0x29)
-**Needed if BNO085:** Adafruit BNO085 breakout (I2C address 0x4A or 0x4B, different footprint)
-
-**Action:** Clarify which sensor is used and update the symbol and footprint accordingly. The BNO085 breakout has INT and RST pins that should be connected to free GPIOs (e.g., GPIO20 for INT, GPIO21 for RST).
+**Resolution:** BNO055 Adafruit STEMMA QT breakout (U2) is confirmed. INT connected to GPIO20 (pin 38); RST connected to GPIO16 (pin 36). I2C address 0x28 (ADDR=GND default on breakout). GPIO21 is reserved for IR-CUT filter and was not used for RST.
 
 ### 11. MOSFET Q1 Choice Is Inappropriate
 
@@ -269,9 +278,9 @@ The mDot requires 100µF bulk + 100nF bypass at VDD for reliable LoRa operation.
 
 The mDot has an active-low nReset pin (pin 5). Currently it is no_connect. For reliable firmware operation, connect nReset to a free GPIO (e.g., GPIO26) via a 10kΩ pull-up to 3.3V and a 100nF cap to GND. Or tie nReset HIGH via 10kΩ to 3.3V if software reset control is not needed.
 
-### 17. Lepton PWREN Control
+### 17. ~~Lepton PWREN Control~~ — FIXED
 
-The Lepton PW_DWN_L (power down, active low) signal on J2-P18 is currently unconnected. For proper initialization, this should be driven HIGH to enable the Lepton (it powers down when asserted LOW). Connect P18 to 3.3V via 10kΩ pull-up (always-on) or to a free GPIO for software control.
+P18 (PW_DWN_L) is tied directly to +3.3V in the schematic (Fix 5). The Lepton is always powered. No software power-down is used in the current design. If software power control is needed in future, replace the direct 3.3V tie with a GPIO via a 10kΩ pull-up.
 
 ### 18. Board-Level 3.3V Rail
 
@@ -281,46 +290,49 @@ Currently the board has no explicit 3.3V rail from the Pi. All sensors operating
 
 ## I2C Address Map (No Conflicts)
 
-| Device | I2C Address | Notes |
-|--------|-------------|-------|
+### I2C1 bus (GPIO2/GPIO3) — shared
+
+| Device | Address | Notes |
+|--------|---------|-------|
 | FLIR Lepton CCI | 0x2A | Fixed |
 | AHT20 | 0x38 | Fixed |
-| WittyPi LM75B (temp) | 0x48 | Fixed, on WittyPi board |
-| BNO055 (I2C mode) | 0x28 or 0x29 | Selectable via ADR pin |
-| BNO085 (if used instead) | 0x4A or 0x4B | Different from BNO055 |
-| WittyPi PCF85063A (RTC) | 0x51 | Fixed, on WittyPi board |
-| HAT EEPROM (CAT24C256) | 0x50 | After adding it |
+| BNO055 (U2) | 0x28 | ADDR=GND (breakout default); solder jumper → 0x29 |
+| WittyPi LM75B | 0x48 | On WittyPi board |
+| WittyPi PCF85063A RTC | 0x51 | On WittyPi board |
+
+### I2C0 bus (GPIO0/GPIO1)
+
+Not used. GPIO0/GPIO1 are unconnected (no EEPROM fitted).
 
 No address conflicts in default configuration.
 
 ---
 
-## GPIO Allocation (Corrected)
+## GPIO Allocation (Current — v7 schematic)
 
-| GPIO | Pi Pin | Function | Used By |
-|------|--------|----------|---------|
-| GPIO2/SDA1 | 3 | I2C SDA | AHT20, BNO, Lepton CCI, HAT EEPROM |
-| GPIO3/SCL1 | 5 | I2C SCL | same |
-| GPIO4 | 7 | SYS_UP / shutdown btn | WittyPi (DO NOT USE) |
-| GPIO6 | 31 | Lepton RESET_L | J2-P17 |
-| GPIO8/CE0 | 24 | SPI CS0 | Lepton VOSPI |
-| GPIO9/MISO | 21 | SPI MISO | Lepton VOSPI |
-| GPIO10/MOSI | 19 | SPI MOSI | Lepton VOSPI |
-| GPIO11/SCLK | 23 | SPI CLK | Lepton VOSPI |
-| GPIO12/TXD5 | 32 | UART5 TX | mDot PA_3 (mDot RX) |
-| GPIO13/RXD5 | 33 | UART5 RX | mDot PA_2 (mDot TX) |
-| GPIO14/TXD0 | 8 | (free — UART0/BT by default) | NC |
-| GPIO15/RXD0 | 10 | (free — UART0/BT by default) | NC |
-| GPIO17 | 11 | SYS_UP | WittyPi (DO NOT USE) |
-| GPIO22 | 15 | IR CUT filter control (Q2 base via R1) | J4 (new connector) |
-| GPIO24 | 18 | Lepton J2-P15 (GPIO2/VSYNC) | J2 |
-| GPIO25 | 22 | Lepton PW_DWN_L | J2-P18 (optional) |
-| GPIO26 | 37 | mDot nReset (optional) | U3 pin 5 |
-| GPIO27 | 13 | (free) | NC |
-| mDot PB_1 (pad 19) | — | WittyPi SW trigger | Q1 gate |
-| GPIO5 | 29 | mDot PA_6/MISO (original) | Review needed |
-| ID_SDA | 27 | HAT EEPROM SDA | U4 (new) |
-| ID_SCL | 28 | HAT EEPROM SCL | U4 (new) |
+See `PIN_MAP.md` for the authoritative and complete pin table. Summary of assigned pins:
+
+| GPIO | Pi Pin | Assigned To | Notes |
+|------|--------|-------------|-------|
+| GPIO0 / ID_SDA | 27 | NC | No EEPROM fitted |
+| GPIO1 / ID_SCL | 28 | NC | No EEPROM fitted |
+| GPIO2 / SDA1 | 3 | I2C1 SDA (shared bus) | Lepton CCI P1, BNO055, AHT20 |
+| GPIO3 / SCL1 | 5 | I2C1 SCL (shared bus) | Lepton CCI P19, BNO055, AHT20 |
+| GPIO4 | 7 | ⛔ WittyPi MCU | Reserved — do not use |
+| GPIO5 | 29 | mDot PA_6 + manual button | Pi drives HIGH when running |
+| GPIO6 | 31 | Lepton RESET_L (J2-P17) | Active-low; pulse LOW to reset |
+| GPIO8 / CE0 | 24 | Lepton SPI CS (J2-P8) | SPI0.CE0 |
+| GPIO9 / MISO | 21 | Lepton SPI MISO (J2-P12) | SPI0.MISO |
+| GPIO10 / MOSI | 19 | Lepton SPI MOSI (J2-P5) | SPI0.MOSI |
+| GPIO11 / SCLK | 23 | Lepton SPI CLK (J2-P3) | SPI0.SCLK |
+| GPIO12 / TXD5 | 32 | mDot PA_3 (mDot RX) | UART5 TX; dtoverlay=uart5 |
+| GPIO13 / RXD5 | 33 | mDot PA_2 (mDot TX) | UART5 RX |
+| GPIO16 | 36 | BNO055 RST | Active-low; hold HIGH at boot |
+| GPIO17 | 11 | ⛔ WittyPi SYS_UP | Reserved — never drive LOW |
+| GPIO20 | 38 | BNO055 INT | Active-low output; configure pull-up |
+| GPIO21 | 40 | IR-CUT filter (external) | External circuit; not on HAT PCB |
+| GPIO24 | 18 | Lepton VSYNC (J2-P15) | Lepton GPIO2 output |
+| Free | 12,13,15,16,22,25,26,29,35,37 | — | Available for future use |
 
 ---
 
