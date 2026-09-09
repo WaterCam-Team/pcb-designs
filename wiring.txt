@@ -1,0 +1,14 @@
+Raspberry Pi GPIO:
+
+Pi pin 2/4 (5V) -> Lepton Breakout P2 (PWR)
+             5V -> BNO0x5/AHT20 PWR
+
+
+Pi pin 3 SDA -> Lepton Breakout P5
+Pi pin 5 SCL -> P8
+
+
+
+WittyPi 6 pin output
+
+

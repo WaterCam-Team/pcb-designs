@@ -1,0 +1,16 @@
+# KiCad auto-backups and per-user editor state
+*-backups/
+*.kicad_prl
+*.kicad_pcb.old
+*.kicad_sch.old
+_autosave-*
+~_autosave-*
+*.lck
+*.kicad_sch-bak
+sym-lib-table-old
+.history
+fp-info-cache
+
+# Vendor datasheets and manuals: not ours to redistribute. See References/README.md.
+References/*.pdf
+References/*.PDF

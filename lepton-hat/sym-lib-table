@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 0)
+  (lib (name "Adafruit AHT20 Temperature & Humidity-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/Adafruit AHT20 Temperature & Humidity-eagle-import.kicad_sym")(options "")(descr ""))
+)
