@@ -1,9 +1,9 @@
 # WaterCam PCB HAT — Design Changes Required
 
 **Prepared:** 2026-03-26  
-**Last updated:** 2026-04-18  
+**Last updated:** 2026-05-10  
 **Board version analyzed:** WaterCam_v6.0_OFM  
-**Current schematic:** WaterCam_mDot_WittyPi_AHT_BNO_Lepton.kicad_sch (v7, fixes applied)  
+**Current schematic:** WaterCam_mDot_WittyPi_AHT_BNO_Lepton.kicad_sch (v8, all schematic fixes applied)  
 **Stack:** Raspberry Pi 4B → WittyPi 4 (40-pin stacking HAT) → This PCB (on top via stacking header)
 
 ---
@@ -19,17 +19,17 @@
 | 5 | IR-CUT camera GPIO circuit | High | ⏸ Deferred — circuit is external to HAT PCB |
 | 6 | WittyPi CATH/VOUT unconnected | High | ⏸ Deferred — not needed for current use case |
 | 7 | HAT EEPROM missing | High | ⏸ N/A — EEPROM not needed on this board |
-| 8 | No decoupling capacitors | High | ⚠️ Open — PCB layout change needed |
-| 9 | No I2C pull-up resistors | High | ⚠️ Open — PCB layout change needed |
+| 8 | No decoupling capacitors | High | ⚠️ PCB layout only — caps not yet placed |
+| 9 | No I2C pull-up resistors | High | ✅ Fixed in schematic — R6, R7 (4.7 kΩ) added |
 | 10 | BNO055/085 ambiguity + INT/RST | Medium | ✅ Fixed — BNO055 confirmed; INT→GPIO20, RST→GPIO16 |
-| 11 | Q1 MOSFET oversized | Medium | ⚠️ Open — functional but inefficient |
-| 12 | Stacking header height | Medium | ⚠️ Open — BOM note only; verify before fab |
-| 13 | mDot duplicate pad "24" | Medium | ⚠️ Open — footprint edit needed |
-| 14 | Q1 gate resistor missing | Medium | ⚠️ Open — add R8 100Ω |
-| 15 | mDot VDD decoupling | Low | ⚠️ Open — same as #8 |
-| 16 | mDot nReset unconnected | Low | ⚠️ Open — tie HIGH or connect GPIO26 |
+| 11 | Q1 MOSFET oversized | Medium | ✅ Fixed in schematic — swapped to 2N7002 SOT-23 |
+| 12 | Stacking header height | Medium | ⚠️ BOM note only — verify 11–13 mm before fab |
+| 13 | mDot duplicate pad "24" | Medium | ⚠️ PCB layout only — footprint edit needed |
+| 14 | Q1 gate resistor missing | Medium | ✅ Fixed in schematic — R8 (100 Ω) added |
+| 15 | mDot VDD decoupling | Low | ⚠️ PCB layout only — same as #8 |
+| 16 | mDot nReset unconnected | Low | ✅ Fixed in schematic — R9 (10 kΩ pull-up) to 3V3 |
 | 17 | Lepton PW_DWN_L unconnected | Low | ✅ Fixed — P18 tied to +3.3V |
-| 18 | Board-level 3.3V rail | Low | ⚠️ Open — deferred |
+| 18 | Board-level 3.3V rail | Low | ⏸ Deferred — J1 pin 1 now drives +3V3 net for pull-ups |
 
 ---
 
@@ -219,11 +219,11 @@ GPIO22 (Pi pin 15) is used — one GPIO only.  GPIO27 is not needed and remains 
 - C6 = 100nF ceramic near J2-P2 (Lepton VIN) → GND
 - Place all caps as close to the device VDD/GND pins as possible
 
-### 9. No I2C Pull-Up Resistors on Board
+### ~~9. No I2C Pull-Up Resistors on Board~~ — FIXED
 
-**Problem:** The I2C bus (GPIO2/SDA1, GPIO3/SCL1) has no pull-up resistors. While the Adafruit breakout boards include their own pull-ups, having multiple boards in parallel weakens the effective pull-up. For reliability (especially with longer traces to the Lepton and mDot), add board-level pull-ups.
+**Problem:** The I2C bus (GPIO2/SDA1, GPIO3/SCL1) had no pull-up resistors. The Adafruit breakout boards include their own pull-ups, but multiple boards in parallel weaken the effective pull-up. The Lepton CCI interface also requires stable pull-ups to reliably acknowledge at 0x2A.
 
-**Action:** Add R6 = 4.7kΩ from SDA1 to 3.3V, R7 = 4.7kΩ from SCL1 to 3.3V.
+**Resolution:** R6 (4.7 kΩ, 0402) from SDA1 to +3V3 and R7 (4.7 kΩ, 0402) from SCL1 to +3V3 added to schematic. Both connect via net labels to the GPIO2/SDA1 and GPIO3/SCL1 nets respectively, with +3V3 symbols at pin 2. J1 pin 1 (Pi 3.3V output) is now connected to the +3V3 power net (no_connect removed). The `power:+3V3` lib_symbol was added to the schematic's inline symbol library. R6 is at schematic position (25.4, 20.32); R7 at (30.48, 20.32), placed above J1.
 
 ---
 
@@ -235,13 +235,11 @@ GPIO22 (Pi pin 15) is used — one GPIO only.  GPIO27 is not needed and remains 
 
 **Resolution:** BNO055 Adafruit STEMMA QT breakout (U2) is confirmed. INT connected to GPIO20 (pin 38); RST connected to GPIO16 (pin 36). I2C address 0x28 (ADDR=GND default on breakout). GPIO21 is reserved for IR-CUT filter and was not used for RST.
 
-### 11. MOSFET Q1 Choice Is Inappropriate
+### ~~11. MOSFET Q1 Choice Is Inappropriate~~ — FIXED
 
-**Problem:** Q1 is an IRLB8721PBF, a 30V/62A power MOSFET in TO-252 package. This is a massive power device for a signal-level switch (the WittyPi SW line is a logic signal, not a power switch). The footprint is large (TO-252) and wastes PCB space.
+**Problem:** Q1 was an IRLB8721PBF, a 30V/62A power MOSFET in TO-252 package — massive overkill for a logic-level signal switch pulling the WittyPi SW line LOW.
 
-**Correct use case:** Q1 gate is driven by mDot PB_1 to pull the WittyPi SW line LOW (simulating a button press to start/stop the Pi). This is a small-signal application.
-
-**Action:** Replace Q1 with a small-signal N-MOSFET such as 2N7002 (SOT-23) or BSS138 (SOT-23). The gate drive from mDot PB_1 (3.3V logic) is sufficient for these devices. Add R8 = 100Ω gate resistor in series (currently missing) to prevent gate ringing. Keep R3 (10kΩ pull-down) as-is.
+**Resolution:** Q1 replaced in schematic with 2N7002 (60V/300mA, SOT-23). The mDot PB_1 3.3V drive is sufficient: Vgs(th) for 2N7002 is 1.0–2.5V. Footprint changed to `Package_TO_SOT_SMD:SOT-23`. R3 (10kΩ pull-down at gate) retained. R8 (100Ω series gate resistor) added simultaneously — see issue #14.
 
 ### 12. WittyPi 40-Pin Stacking Header Required
 
@@ -262,9 +260,11 @@ The current design uses a single 2×20 header (J1) with `MODULE_RASPBERRY_PI_4B_
 
 **Action:** Correct the MTDOT footprint — verify against the mDot physical dimensions. The mDot has 20 castellated pads (10 each side) plus bottom RF pad and GND pad. Pads should be numbered 1–20 plus RF/GND pads with unique numbers.
 
-### 14. MOSFET Q1 Gate Resistor Missing
+### ~~14. MOSFET Q1 Gate Resistor Missing~~ — FIXED
 
-**Action:** Add R8 = 100Ω in series between mDot PB_1 and Q1 gate. This limits ringing on gate drive from the LoRa module output. The current design connects mDot PB_1 directly to Q1 gate with only the 10kΩ pull-down.
+**Problem:** mDot PB_1 drove Q1 gate directly. The LoRa module GPIO transitions can excite gate-source capacitance (Ciss ≈ 50–100 pF on 2N7002), causing ringing that may produce spurious switching.
+
+**Resolution:** R8 (100 Ω, 0402) added in series between mDot PB_1 and Q1 gate. R3 (10 kΩ pull-down) connects on the gate side of R8, providing DC bias when mDot is unpowered. Topology: mDot PB_1 → R8 → Q1 gate; R3 from gate to GND.
 
 ---
 
@@ -274,9 +274,11 @@ The current design uses a single 2×20 header (J1) with `MODULE_RASPBERRY_PI_4B_
 
 The mDot requires 100µF bulk + 100nF bypass at VDD for reliable LoRa operation. The mDot VDD connects to J3-3V3 (WittyPi internal 3V3), which is the correct always-on power domain (see item 6). Add the decoupling capacitors within 5mm of the mDot VDD pin so that LoRa TX current spikes are sourced locally rather than drawn from the WittyPi MCU/RTC rail.
 
-### 16. mDot nReset Connection
+### ~~16. mDot nReset Connection~~ — FIXED
 
-The mDot has an active-low nReset pin (pin 5). Currently it is no_connect. For reliable firmware operation, connect nReset to a free GPIO (e.g., GPIO26) via a 10kΩ pull-up to 3.3V and a 100nF cap to GND. Or tie nReset HIGH via 10kΩ to 3.3V if software reset control is not needed.
+**Problem:** mDot NRESET (active-low, pad 5) was no_connect. A floating NRESET can cause spurious resets from noise.
+
+**Resolution:** R9 (10 kΩ, 0402) pull-up added from NRESET to WittyPi J3-3V3 (always-on 3.3V — same supply domain as mDot VDD). The pull-up must use the always-on rail, not Pi 3.3V: if Pi 3.3V were used, NRESET would assert LOW during Pi shutdown and hold the mDot in reset, breaking the remote-wake path. Software reset control was not added; GPIO26 remains free.
 
 ### 17. ~~Lepton PWREN Control~~ — FIXED
 

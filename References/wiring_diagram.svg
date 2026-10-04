@@ -1,0 +1,351 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 900" font-family="monospace" font-size="11.5">
+
+  <!-- background -->
+  <rect width="1060" height="900" fill="white"/>
+
+  <!-- title -->
+  <text x="530" y="24" text-anchor="middle" font-size="14" font-weight="bold">WaterCam HAT — Wiring Diagram</text>
+
+  <!-- ═══════════════════════════════════════════
+       PI 4B J1 HEADER BLOCK
+       x=10–220, rows start at y=40
+       ═══════════════════════════════════════════ -->
+  <rect x="10" y="35" width="210" height="820" fill="none" stroke="black" stroke-width="1.5"/>
+  <rect x="10" y="35" width="210" height="18" fill="black"/>
+  <text x="115" y="48" text-anchor="middle" font-size="11" fill="white" font-weight="bold">Raspberry Pi 4B  J1</text>
+
+  <!-- pin rows — label left, stub right at x=220 -->
+  <!-- each row: y_center -->
+
+  <!-- group: I2C0 / EEPROM -->
+  <text x="18" y="76"  font-size="10" fill="#444">── I2C0 ──────────────────</text>
+  <text x="18" y="93"  >GPIO0  ID_SDA  (pin 27)</text>
+  <line x1="220" y1="90"  x2="245" y2="90"  stroke="black" stroke-width="1.2"/>
+  <text x="18" y="113" >GPIO1  ID_SCL  (pin 28)</text>
+  <line x1="220" y1="110" x2="245" y2="110" stroke="black" stroke-width="1.2"/>
+
+  <!-- group: I2C1 shared -->
+  <text x="18" y="133" font-size="10" fill="#444">── I2C1 (shared bus) ──────</text>
+  <text x="18" y="150" >GPIO2  SDA1    (pin 3)</text>
+  <line x1="220" y1="147" x2="270" y2="147" stroke="black" stroke-width="1.8"/>
+  <text x="18" y="170" >GPIO3  SCL1    (pin 5)</text>
+  <line x1="220" y1="167" x2="270" y2="167" stroke="black" stroke-width="1.8"/>
+
+  <!-- group: SPI0 -->
+  <text x="18" y="190" font-size="10" fill="#444">── SPI0 ───────────────────</text>
+  <text x="18" y="207" >GPIO8  CE0     (pin 24)</text>
+  <line x1="220" y1="204" x2="245" y2="204" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="227" >GPIO9  MISO    (pin 21)</text>
+  <line x1="220" y1="224" x2="245" y2="224" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="247" >GPIO10 MOSI    (pin 19)</text>
+  <line x1="220" y1="244" x2="245" y2="244" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="267" >GPIO11 SCLK    (pin 23)</text>
+  <line x1="220" y1="264" x2="245" y2="264" stroke="black" stroke-width="1.2"/>
+
+  <!-- group: UART5 -->
+  <text x="18" y="287" font-size="10" fill="#444">── UART5 ──────────────────</text>
+  <text x="18" y="304" >GPIO12 TXD5    (pin 32)</text>
+  <line x1="220" y1="301" x2="245" y2="301" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="324" >GPIO13 RXD5    (pin 33)</text>
+  <line x1="220" y1="321" x2="245" y2="321" stroke="black" stroke-width="1.2"/>
+
+  <!-- group: control GPIOs -->
+  <text x="18" y="344" font-size="10" fill="#444">── GPIO ───────────────────</text>
+  <text x="18" y="361" >GPIO5          (pin 29)</text>
+  <line x1="220" y1="358" x2="245" y2="358" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="381" >GPIO6          (pin 31)</text>
+  <line x1="220" y1="378" x2="245" y2="378" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="401" >GPIO16         (pin 36)</text>
+  <line x1="220" y1="398" x2="245" y2="398" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="421" >GPIO20         (pin 38)</text>
+  <line x1="220" y1="418" x2="245" y2="418" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="441" >GPIO21         (pin 40)</text>
+  <line x1="220" y1="438" x2="245" y2="438" stroke="black" stroke-width="1.2"/>
+  <text x="18" y="461" >GPIO24         (pin 18)</text>
+  <line x1="220" y1="458" x2="245" y2="458" stroke="black" stroke-width="1.2"/>
+
+  <!-- group: power rails (no lines drawn, just labels) -->
+  <text x="18" y="481" font-size="10" fill="#444">── Power rails ────────────</text>
+  <text x="18" y="498" >3.3 V          (pin 1)</text>
+  <text x="18" y="514" >5 V            (pin 2)</text>
+
+  <!-- group: reserved (no connection lines) -->
+  <text x="18" y="537" font-size="10" fill="#888">── WittyPi reserved ───────</text>
+  <text x="18" y="554" fill="#888">GPIO4  (pin 7)  ⛔ DO NOT USE</text>
+  <text x="18" y="570" fill="#888">GPIO17 (pin 11) ⛔ SYS_UP</text>
+
+  <!-- ═══════════════════════════════════════════
+       I2C1 BUS BARS
+       vertical bars at x=270/290, between Pi and devices
+       ═══════════════════════════════════════════ -->
+  <!-- SDA bus -->
+  <line x1="270" y1="147" x2="270" y2="790" stroke="black" stroke-width="1.8"/>
+  <text x="258" y="145" font-size="9" text-anchor="end">SDA</text>
+  <!-- SCL bus -->
+  <line x1="290" y1="167" x2="290" y2="790" stroke="black" stroke-width="1.8"/>
+  <text x="258" y="165" font-size="9" text-anchor="end">SCL</text>
+
+  <!-- bus junction dots at source -->
+  <circle cx="270" cy="147" r="3" fill="black"/>
+  <circle cx="290" cy="167" r="3" fill="black"/>
+
+
+  <!-- ═══════════════════════════════════════════
+       EEPROM U4  (CAT24C256)
+       x=375–640, y=60–170
+       ═══════════════════════════════════════════ -->
+  <rect x="375" y="60" width="265" height="120" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="507" y="76"  text-anchor="middle" font-weight="bold">EEPROM U4 (CAT24C256)</text>
+  <text x="507" y="90"  text-anchor="middle" font-size="10">addr 0x50 · A0=A1=A2=WP=GND · VCC=3.3V</text>
+
+  <!-- EEPROM pin stubs at left (x=375) -->
+  <line x1="375" y1="90"  x2="350" y2="90"  stroke="black" stroke-width="1.2"/>
+  <text x="380" y="93"  >SDA</text>
+  <line x1="375" y1="110" x2="350" y2="110" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="113" >SCL</text>
+  <text x="380" y="130" font-size="10">R4  3.9 kΩ pull-up SDA → +3.3V</text>
+  <text x="380" y="147" font-size="10">R5  3.9 kΩ pull-up SCL → +3.3V</text>
+  <text x="380" y="164" font-size="10">GPIO0/ID_SDA · GPIO1/ID_SCL  (I2C0)</text>
+
+  <!-- I2C0 lines: GPIO0(y=90)→EEPROM SDA, GPIO1(y=110)→EEPROM SCL -->
+  <line x1="245" y1="90"  x2="350" y2="90"  stroke="black" stroke-width="1.2"/>
+  <line x1="245" y1="110" x2="350" y2="110" stroke="black" stroke-width="1.2"/>
+  <!-- vertical connector from Pi stubs -->
+  <line x1="245" y1="90" x2="245" y2="110" stroke="black" stroke-width="1.2"/>
+  <!-- route up from Pi y=90,110 stubs -->
+  <line x1="245" y1="90"  x2="245" y2="90"  stroke="black" stroke-width="0"/>
+
+
+  <!-- ═══════════════════════════════════════════
+       FLIR LEPTON J2  (Breakout Board v2)
+       x=375–700, y=195–550
+       ═══════════════════════════════════════════ -->
+  <rect x="375" y="195" width="325" height="365" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="537" y="212" text-anchor="middle" font-weight="bold">FLIR Lepton Breakout v2 (J2)</text>
+
+  <!-- Lepton pin stubs at left (x=375) -->
+  <!-- P1 SDA  — branch from I2C bus at y=230 -->
+  <line x1="375" y1="230" x2="320" y2="230" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="233">P1   SDA (CCI)</text>
+  <circle cx="270" cy="230" r="3" fill="black"/>
+  <line x1="270" y1="230" x2="320" y2="230" stroke="black" stroke-width="1.2"/>
+
+  <!-- P19 SCL — branch from I2C bus at y=250 -->
+  <line x1="375" y1="250" x2="320" y2="250" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="253">P19  SCL (CCI)</text>
+  <circle cx="290" cy="250" r="3" fill="black"/>
+  <line x1="290" y1="250" x2="320" y2="250" stroke="black" stroke-width="1.2"/>
+
+  <!-- P2  VIN +5V -->
+  <text x="380" y="273">P2   VIN  (+5 V)</text>
+
+  <!-- P8  SPI CS  — from GPIO8 y=204 → route down to y=290 inside block -->
+  <line x1="375" y1="293" x2="340" y2="293" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="296">P8   SPI CS</text>
+  <line x1="245" y1="204" x2="340" y2="204" stroke="black" stroke-width="1.2"/>
+  <line x1="340" y1="204" x2="340" y2="293" stroke="black" stroke-width="1.2"/>
+
+  <!-- P12 SPI MISO — from GPIO9 y=224 → route to y=313 -->
+  <line x1="375" y1="316" x2="345" y2="316" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="319">P12  SPI MISO</text>
+  <line x1="245" y1="224" x2="345" y2="224" stroke="black" stroke-width="1.2"/>
+  <line x1="345" y1="224" x2="345" y2="316" stroke="black" stroke-width="1.2"/>
+
+  <!-- P5  SPI MOSI — from GPIO10 y=244 -->
+  <line x1="375" y1="339" x2="350" y2="339" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="342">P5   SPI MOSI</text>
+  <line x1="245" y1="244" x2="350" y2="244" stroke="black" stroke-width="1.2"/>
+  <line x1="350" y1="244" x2="350" y2="339" stroke="black" stroke-width="1.2"/>
+
+  <!-- P3  SPI CLK — from GPIO11 y=264 -->
+  <line x1="375" y1="362" x2="355" y2="362" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="365">P3   SPI CLK</text>
+  <line x1="245" y1="264" x2="355" y2="264" stroke="black" stroke-width="1.2"/>
+  <line x1="355" y1="264" x2="355" y2="362" stroke="black" stroke-width="1.2"/>
+
+  <!-- P18 PW_DWN_L +3.3V -->
+  <text x="380" y="387">P18  PW_DWN_L (+3.3V, tied HIGH)</text>
+
+  <!-- P17 RESET_L — from GPIO6 y=378 -->
+  <line x1="375" y1="410" x2="360" y2="410" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="413">P17  RESET_L</text>
+  <line x1="245" y1="378" x2="360" y2="378" stroke="black" stroke-width="1.2"/>
+  <line x1="360" y1="378" x2="360" y2="410" stroke="black" stroke-width="1.2"/>
+
+  <!-- P15 VSYNC — from GPIO24 y=458 -->
+  <line x1="375" y1="458" x2="245" y2="458" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="461">P15  VSYNC / GPIO2</text>
+
+  <!-- NC note -->
+  <text x="380" y="490" font-size="10">P4 P6 P7 P9–P11 P13 P14 P16 P20  NC</text>
+  <text x="380" y="510" font-size="10">P2: +5V from Pi pin 2/4</text>
+  <text x="380" y="527" font-size="10">P18: +3.3V from Pi pin 1</text>
+
+
+  <!-- ═══════════════════════════════════════════
+       BNO055 U2
+       x=375–640, y=570–700
+       ═══════════════════════════════════════════ -->
+  <rect x="375" y="570" width="265" height="140" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="507" y="586" text-anchor="middle" font-weight="bold">BNO055 STEMMA QT (U2)</text>
+  <text x="507" y="599" text-anchor="middle" font-size="10">addr 0x28 · VIN=3.3V · PS0=PS1=ADR=GND (breakout)</text>
+
+  <!-- BNO055 SDA — branch from I2C bus -->
+  <line x1="375" y1="618" x2="310" y2="618" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="621">SDA</text>
+  <circle cx="270" cy="618" r="3" fill="black"/>
+  <line x1="270" y1="618" x2="310" y2="618" stroke="black" stroke-width="1.2"/>
+
+  <!-- BNO055 SCL — branch from I2C bus -->
+  <line x1="375" y1="637" x2="310" y2="637" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="640">SCL</text>
+  <circle cx="290" cy="637" r="3" fill="black"/>
+  <line x1="290" y1="637" x2="310" y2="637" stroke="black" stroke-width="1.2"/>
+
+  <!-- BNO055 RST — from GPIO16 y=398 route down to y=660 -->
+  <line x1="375" y1="658" x2="362" y2="658" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="661">RST  (active low)</text>
+  <line x1="245" y1="398" x2="362" y2="398" stroke="black" stroke-width="1.2"/>
+  <line x1="362" y1="398" x2="362" y2="658" stroke="black" stroke-width="1.2"/>
+
+  <!-- BNO055 INT — from GPIO20 y=418 -->
+  <line x1="375" y1="680" x2="368" y2="680" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="683">INT  (active low out)</text>
+  <line x1="245" y1="418" x2="368" y2="418" stroke="black" stroke-width="1.2"/>
+  <line x1="368" y1="418" x2="368" y2="680" stroke="black" stroke-width="1.2"/>
+
+
+  <!-- ═══════════════════════════════════════════
+       AHT20 U1
+       x=375–640, y=720–800
+       ═══════════════════════════════════════════ -->
+  <rect x="375" y="720" width="265" height="80" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="507" y="736" text-anchor="middle" font-weight="bold">AHT20 Temp/Humidity (U1)</text>
+  <text x="507" y="749" text-anchor="middle" font-size="10">addr 0x38 · VIN=3.3V · fixed address</text>
+
+  <!-- AHT20 SDA — branch from I2C bus -->
+  <line x1="375" y1="763" x2="310" y2="763" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="766">SDA</text>
+  <circle cx="270" cy="763" r="3" fill="black"/>
+  <line x1="270" y1="763" x2="310" y2="763" stroke="black" stroke-width="1.2"/>
+
+  <!-- AHT20 SCL — branch from I2C bus -->
+  <line x1="375" y1="783" x2="310" y2="783" stroke="black" stroke-width="1.2"/>
+  <text x="380" y="786">SCL</text>
+  <circle cx="290" cy="783" r="3" fill="black"/>
+  <line x1="290" y1="783" x2="310" y2="783" stroke="black" stroke-width="1.2"/>
+
+  <!-- I2C bus terminates below AHT20 -->
+  <!-- SDA and SCL bus bars end here (already drawn to y=790) -->
+
+
+  <!-- ═══════════════════════════════════════════
+       mDot U3  (MTDOT-915)
+       x=710–990, y=60–320
+       ═══════════════════════════════════════════ -->
+  <rect x="710" y="60" width="280" height="270" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="850" y="77"  text-anchor="middle" font-weight="bold">Multitech mDot U3 (MTDOT-915)</text>
+  <text x="850" y="90"  text-anchor="middle" font-size="10">/dev/ttyAMA5 · 115200 8N1</text>
+  <text x="850" y="103" text-anchor="middle" font-size="10">VDD = WittyPi J3 pin 2 (always-on 3.3V)</text>
+
+  <!-- mDot pin stubs at left (x=710) -->
+  <!-- PA_3 (RX←Pi TX) from GPIO12 y=301 -->
+  <line x1="710" y1="130" x2="690" y2="130" stroke="black" stroke-width="1.2"/>
+  <text x="715" y="133">PA_3  (RX ← Pi GPIO12/TXD5)</text>
+  <line x1="245" y1="301" x2="690" y2="301" stroke="black" stroke-width="1.2"/>
+  <line x1="690" y1="130" x2="690" y2="301" stroke="black" stroke-width="1.2"/>
+
+  <!-- PA_2 (TX→Pi RX) from GPIO13 y=321 -->
+  <line x1="710" y1="155" x2="685" y2="155" stroke="black" stroke-width="1.2"/>
+  <text x="715" y="158">PA_2  (TX → Pi GPIO13/RXD5)</text>
+  <line x1="245" y1="321" x2="685" y2="321" stroke="black" stroke-width="1.2"/>
+  <line x1="685" y1="155" x2="685" y2="321" stroke="black" stroke-width="1.2"/>
+
+  <!-- PA_6 from GPIO5 y=358 -->
+  <line x1="710" y1="180" x2="680" y2="180" stroke="black" stroke-width="1.2"/>
+  <text x="715" y="183">PA_6  (Pi state / GPIO5, pin 29)</text>
+  <line x1="245" y1="358" x2="680" y2="358" stroke="black" stroke-width="1.2"/>
+  <line x1="680" y1="180" x2="680" y2="358" stroke="black" stroke-width="1.2"/>
+
+  <!-- PB_1 → Q1 gate (internal routing note) -->
+  <line x1="710" y1="205" x2="695" y2="205" stroke="black" stroke-width="1.2"/>
+  <text x="715" y="208">PB_1  → Q1 gate (remote start)</text>
+
+  <!-- VDD note -->
+  <text x="715" y="233" font-size="10">VDD ← WittyPi J3 pin 2 (3.3V always-on)</text>
+  <text x="715" y="250" font-size="10">GND ← WittyPi J3 pin 7</text>
+  <text x="715" y="267" font-size="10">Antenna: built-in u.FL on mDot</text>
+  <text x="715" y="284" font-size="10">config.txt: enable_uart=1</text>
+  <text x="715" y="300" font-size="10">config.txt: dtoverlay=uart5</text>
+
+
+  <!-- ═══════════════════════════════════════════
+       WittyPi 4 J3 header
+       x=710–990, y=340–470
+       ═══════════════════════════════════════════ -->
+  <rect x="710" y="340" width="280" height="140" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="850" y="357" text-anchor="middle" font-weight="bold">WittyPi 4 — P3 Header (J3)</text>
+
+  <text x="718" y="377">Pin 1  VOUT    NC</text>
+  <text x="718" y="397">Pin 2  3V3     → mDot VDD  (always-on)</text>
+  <text x="718" y="417">Pin 5  SW      → Q1 Drain</text>
+  <text x="718" y="437">Pin 7  GND     → mDot GND, Q1 Source</text>
+  <text x="718" y="457">Pins 3,4,6     NC</text>
+
+
+  <!-- ═══════════════════════════════════════════
+       Q1 MOSFET remote-start circuit
+       x=710–990, y=490–660
+       ═══════════════════════════════════════════ -->
+  <rect x="710" y="490" width="280" height="180" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="850" y="507" text-anchor="middle" font-weight="bold">Q1 Remote-Start Circuit</text>
+
+  <!-- MOSFET symbol (simplified) -->
+  <!-- Gate vertical line -->
+  <line x1="780" y1="530" x2="780" y2="600" stroke="black" stroke-width="1.5"/>
+  <!-- Gate stub -->
+  <line x1="740" y1="565" x2="775" y2="565" stroke="black" stroke-width="1.5"/>
+  <line x1="775" y1="545" x2="775" y2="585" stroke="black" stroke-width="1.5"/>
+  <!-- Drain -->
+  <line x1="780" y1="540" x2="800" y2="540" stroke="black" stroke-width="1.5"/>
+  <!-- Source -->
+  <line x1="780" y1="590" x2="800" y2="590" stroke="black" stroke-width="1.5"/>
+  <!-- Body (rectangle) -->
+  <rect x="779" y="530" width="20" height="70" fill="none" stroke="black" stroke-width="1.2"/>
+  <!-- Arrow (N-ch) -->
+  <line x1="799" y1="540" x2="799" y2="590" stroke="black" stroke-width="1.2"/>
+
+  <!-- Labels -->
+  <text x="718" y="548" font-size="10">GATE  ← mDot PB_1</text>
+  <text x="718" y="563" font-size="10">         R3 10kΩ → GND</text>
+  <text x="825" y="543" font-size="10">DRAIN  ← WittyPi J3 SW (pin 5)</text>
+  <text x="825" y="595" font-size="10">SOURCE → GND</text>
+
+  <text x="718" y="615" font-size="10">PB_1 HIGH → Q1 ON → SW pulled LOW</text>
+  <text x="718" y="630" font-size="10">→ WittyPi wakes Raspberry Pi</text>
+  <text x="718" y="648" font-size="10">R3 pull-down holds gate=0V when mDot off</text>
+  <text x="718" y="663" font-size="10">Q1: N-ch MOSFET (e.g. BSS138)</text>
+
+
+  <!-- ═══════════════════════════════════════════
+       GPIO21 label (IR-CUT, external, no device block)
+       ═══════════════════════════════════════════ -->
+  <line x1="245" y1="438" x2="370" y2="438" stroke="black" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="372" y="441" font-size="10">(IR-CUT filter, external — not on HAT PCB)</text>
+
+
+  <!-- ═══════════════════════════════════════════
+       LEGEND / notes
+       ═══════════════════════════════════════════ -->
+  <rect x="710" y="700" width="280" height="150" fill="none" stroke="#aaa" stroke-width="1"/>
+  <text x="850" y="717" text-anchor="middle" font-size="10" font-weight="bold">Notes</text>
+  <text x="718" y="733" font-size="10">• I2C1 SDA/SCL bus shared: Lepton CCI,</text>
+  <text x="718" y="748" font-size="10">  BNO055, AHT20 (bus bar shown at left)</text>
+  <text x="718" y="763" font-size="10">• I2C0 is dedicated to HAT EEPROM only</text>
+  <text x="718" y="778" font-size="10">• GPIO16 held HIGH at boot (BNO055 RST)</text>
+  <text x="718" y="793" font-size="10">• GPIO4, GPIO17: WittyPi reserved</text>
+  <text x="718" y="808" font-size="10">• 3.3V/5V/GND not routed in diagram</text>
+  <text x="718" y="823" font-size="10">  (labeled inside each device block)</text>
+  <text x="718" y="838" font-size="10">• Dashed line = no HAT PCB trace</text>
+
+</svg>

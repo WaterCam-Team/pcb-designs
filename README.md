@@ -30,9 +30,9 @@ Raspberry Pi 4B → WittyPi 4 (stacking header) → WaterCam HAT
 
 | Rail | Source | Powers |
 |------|--------|--------|
-| 3.3 V (Pi) | Pi J1 pin 1 | AHT20, BNO055 breakout |
+| +3V3 (Pi) | Pi J1 pin 1 | AHT20, BNO055 breakout, I2C pull-ups R6/R7 |
 | 5 V (Pi) | Pi J1 pin 2/4 | FLIR Lepton VIN (J2-P2) |
-| 3.3 V (always-on) | WittyPi J3 pin 2 | mDot VDD — survives Pi shutdown |
+| 3.3 V (always-on) | WittyPi J3 pin 2 | mDot VDD, mDot NRESET pull-up — survives Pi shutdown |
 
 ---
 

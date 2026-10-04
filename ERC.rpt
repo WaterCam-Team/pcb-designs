@@ -1,0 +1,210 @@
+ERC report (2026-05-10T20:24:59, Encoding UTF8)
+Report includes: Warnings
+
+***** Sheet /
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(1000 mils, 700 mils): Symbol #PWR016 [+3V3]
+[lib_symbol_mismatch]: Symbol 'R_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(1000 mils, 800 mils): Symbol R6 [R_Small]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(1100 mils, 4800 mils): Symbol #PWR011 [GND]
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(1200 mils, 700 mils): Symbol #PWR017 [+3V3]
+[lib_symbol_mismatch]: Symbol 'R_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(1200 mils, 800 mils): Symbol R7 [R_Small]
+[lib_symbol_issues]: Symbol 'WittyPi4L3V7_P3Header' not found in symbol library 'Adafruit BNO055 STEMMA QT-eagle-import'
+    ; warning
+    @(1300 mils, 7600 mils): Symbol J3 [WittyPi4L3V7_P3Header]
+[lib_symbol_mismatch]: Symbol '+5V' doesn't match copy in library 'power'
+    ; warning
+    @(1600 mils, 4450 mils): Symbol #PWR07 [+5V]
+[footprint_link_issues]: The current configuration does not include the footprint library 'Adafruit AHT20 Temperature & Humidity'
+    ; warning
+    @(1850 mils, 5050 mils): Symbol U1 [AHT20]
+[lib_symbol_issues]: The current configuration does not include the symbol library 'Adafruit AHT20 Temperature & Humidity-eagle-import'
+    ; warning
+    @(1850 mils, 5050 mils): Symbol U1 [AHT20]
+[missing_bidi_pin]: Symbol U1 has bidirectional pins in units [ B, C ] that are not placed
+    ; warning
+    @(1850 mils, 5050 mils): Symbol U1 [AHT20]
+[missing_unit]: Symbol U1 has unplaced units [ B, C ]
+    ; warning
+    @(1850 mils, 5050 mils): Symbol U1 [AHT20]
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(2400 mils, 1100 mils): Symbol #PWR015 [+3V3]
+[footprint_link_issues]: The current configuration does not include the footprint library 'Raspberry Pi 4B 4GB'
+    ; warning
+    @(2600 mils, 2000 mils): Symbol J1 [Conn_02x20_Odd_Even]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(2700 mils, 3350 mils): Symbol #PWR03 [GND]
+[pin_to_pin]: Pins of type Bidirectional and Power output are connected
+    ; warning
+    @(2700 mils, 7200 mils): Symbol J3 Pin 5 [SW, Bidirectional, Line]
+    @(2850 mils, 3300 mils): Symbol #FLG03 Pin 1 [Power output, Line]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(2800 mils, 7500 mils): Symbol #PWR04 [GND]
+[lib_symbol_mismatch]: Symbol '+5V' doesn't match copy in library 'power'
+    ; warning
+    @(3200 mils, 1000 mils): Symbol #PWR01 [+5V]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(4050 mils, 6950 mils): Symbol #PWR012 [GND]
+[lib_symbol_mismatch]: Symbol '+5V' doesn't match copy in library 'power'
+    ; warning
+    @(4600 mils, 4200 mils): Symbol #PWR06 [+5V]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(4900 mils, 1800 mils): Symbol #PWR010 [GND]
+[lib_symbol_mismatch]: Symbol '+5V' doesn't match copy in library 'power'
+    ; warning
+    @(5300 mils, 1150 mils): Symbol #PWR05 [+5V]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(5900 mils, 4300 mils): Symbol #PWR09 [GND]
+[footprint_link_issues]: The current configuration does not include the footprint library 'Adafruit BNO055 STEMMA QT'
+    ; warning
+    @(6050 mils, 1150 mils): Symbol U2 [BNO055_Simple]
+[lib_symbol_issues]: Symbol 'BNO055_Simple' not found in symbol library 'Adafruit BNO055 STEMMA QT-eagle-import'
+    ; warning
+    @(6050 mils, 1150 mils): Symbol U2 [BNO055_Simple]
+[lib_symbol_mismatch]: Symbol 'R_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(6300 mils, 6800 mils): Symbol R8 [R_Small]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(6750 mils, 6250 mils): Symbol #PWR014 [GND]
+[lib_symbol_mismatch]: Symbol 'R_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(7000 mils, 6350 mils): Symbol R3 [R_Small]
+[lib_symbol_mismatch]: Symbol 'R_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(9600 mils, 3100 mils): Symbol R9 [R_Small]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(10350 mils, 3200 mils): Symbol #PWR02 [GND]
+[lib_symbol_mismatch]: Symbol 'MTDOT-915' doesn't match copy in library 'mDOT'
+    ; warning
+    @(10800 mils, 3300 mils): Symbol U3 [MTDOT-915]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(11417 mils, 6239 mils): Symbol #PWR018 Hidden pin 1 [+3V3, Power input, Line]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(11417 mils, 6239 mils): Symbol C1 Pin 1 [~, Passive, Line]
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(11417 mils, 6239 mils): Symbol #PWR018 [+3V3]
+[lib_symbol_mismatch]: Symbol 'C_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(11417 mils, 6299 mils): Symbol C1 [C_Small]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(11417 mils, 6359 mils): Symbol #PWR019 Hidden pin 1 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(11417 mils, 6359 mils): Symbol #PWR019 [GND]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(11732 mils, 6239 mils): Symbol #PWR020 Hidden pin 1 [+3V3, Power input, Line]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(11732 mils, 6239 mils): Symbol C2 Pin 1 [~, Passive, Line]
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(11732 mils, 6239 mils): Symbol #PWR020 [+3V3]
+[lib_symbol_mismatch]: Symbol 'C_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(11732 mils, 6299 mils): Symbol C2 [C_Small]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(11732 mils, 6359 mils): Symbol #PWR021 Hidden pin 1 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(11732 mils, 6359 mils): Symbol #PWR021 [GND]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12047 mils, 6239 mils): Symbol #PWR022 Hidden pin 1 [+3V3, Power input, Line]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12047 mils, 6239 mils): Symbol C3 Pin 1 [~, Passive, Line]
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(12047 mils, 6239 mils): Symbol #PWR022 [+3V3]
+[lib_symbol_mismatch]: Symbol 'C_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(12047 mils, 6299 mils): Symbol C3 [C_Small]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12047 mils, 6359 mils): Symbol #PWR023 Hidden pin 1 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(12047 mils, 6359 mils): Symbol #PWR023 [GND]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12362 mils, 6239 mils): Symbol #PWR024 Hidden pin 1 [+3V3, Power input, Line]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12362 mils, 6239 mils): Symbol C4 Pin 1 [~, Passive, Line]
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(12362 mils, 6239 mils): Symbol #PWR024 [+3V3]
+[lib_symbol_mismatch]: Symbol 'C_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(12362 mils, 6299 mils): Symbol C4 [C_Small]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12362 mils, 6359 mils): Symbol #PWR025 Hidden pin 1 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(12362 mils, 6359 mils): Symbol #PWR025 [GND]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12677 mils, 6239 mils): Symbol #PWR026 Hidden pin 1 [+3V3, Power input, Line]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12677 mils, 6239 mils): Symbol C5 Pin 1 [~, Passive, Line]
+[lib_symbol_mismatch]: Symbol '+3V3' doesn't match copy in library 'power'
+    ; warning
+    @(12677 mils, 6239 mils): Symbol #PWR026 [+3V3]
+[lib_symbol_mismatch]: Symbol 'C_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(12677 mils, 6299 mils): Symbol C5 [C_Small]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12677 mils, 6359 mils): Symbol #PWR027 Hidden pin 1 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(12677 mils, 6359 mils): Symbol #PWR027 [GND]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12992 mils, 6239 mils): Symbol C6 Pin 1 [~, Passive, Line]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12992 mils, 6239 mils): Symbol #PWR028 Hidden pin 1 [+5V, Power input, Line]
+[lib_symbol_mismatch]: Symbol '+5V' doesn't match copy in library 'power'
+    ; warning
+    @(12992 mils, 6239 mils): Symbol #PWR028 [+5V]
+[lib_symbol_mismatch]: Symbol 'C_Small' doesn't match copy in library 'Device'
+    ; warning
+    @(12992 mils, 6299 mils): Symbol C6 [C_Small]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(12992 mils, 6359 mils): Symbol #PWR029 Hidden pin 1 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol 'GND' doesn't match copy in library 'power'
+    ; warning
+    @(12992 mils, 6359 mils): Symbol #PWR029 [GND]
+
+ ** ERC messages: 66  Errors 0  Warnings 66
+
+ ** Ignored checks:
+    - Global label only appears once in the schematic
+    - Four connection points are joined together
+    - Assigned footprint doesn't match footprint filters
