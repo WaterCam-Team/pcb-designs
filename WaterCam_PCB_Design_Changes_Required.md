@@ -1,7 +1,7 @@
 # WaterCam PCB HAT — Design Changes Required
 
 **Prepared:** 2026-03-26  
-**Last updated:** 2026-05-10  
+**Last updated:** 2026-10-19  
 **Board version analyzed:** WaterCam_v6.0_OFM  
 **Current schematic:** WaterCam_mDot_WittyPi_AHT_BNO_Lepton.kicad_sch (v8, all schematic fixes applied)  
 **Stack:** Raspberry Pi 4B → WittyPi 4 (40-pin stacking HAT) → This PCB (on top via stacking header)
@@ -30,6 +30,7 @@
 | 16 | mDot nReset unconnected | Low | ✅ Fixed in schematic — R9 (10 kΩ pull-up) to 3V3 |
 | 17 | Lepton PW_DWN_L unconnected | Low | ✅ Fixed — P18 tied to +3.3V |
 | 18 | Board-level 3.3V rail | Low | ⏸ Deferred — J1 pin 1 now drives +3V3 net for pull-ups |
+| 19 | Bulk capacitance at the WittyPi 5 V input | High | 🔬 Bench test first — see section 19 |
 
 ---
 
@@ -218,6 +219,45 @@ GPIO22 (Pi pin 15) is used — one GPIO only.  GPIO27 is not needed and remains 
 - C5 = 100nF ceramic near BNO055/BNO085 VIN → GND
 - C6 = 100nF ceramic near J2-P2 (Lepton VIN) → GND
 - Place all caps as close to the device VDD/GND pins as possible
+
+### 19. Bulk Capacitance at the WittyPi 5 V Input
+
+**Problem:** On bench tests with the V50 battery, most scheduled wakes began with the WittyPi itself losing input power at the moment it switched the Pi on, before Linux started. The WittyPi then restarted the Pi after its Default ON delay. The likely cause is the load step on the V50 output and cable when the Pi's input caps charge. A low-impedance bulk capacitor at the WittyPi input would supply the first part of that step. See SU-WaterCam `docs/UNIT006_POWER_FAILURE.md`.
+
+**Capacitor type:** an aluminium **polymer** (solid) capacitor, with a ceramic in parallel.
+
+| Ref | Value | Type | Purpose |
+|-----|-------|------|---------|
+| C10 | 1000 µF, 16 V (470 µF minimum) | Aluminium polymer, ESR ≤ 20 mΩ, ripple current ≥ 3 A, −55 to +105 °C, radial THT (8–10 mm can) | Bulk: supplies the switch-on step |
+| C11 | 10 µF, 25 V | X7R ceramic, 1206 | Mid-frequency; 25 V rating limits DC-bias loss at 5 V |
+| C12 | 100 nF, 50 V | X7R ceramic, 0603 | High-frequency bypass |
+
+Pick a stocked part that meets the C10 spec (for example from the Panasonic OS-CON or Nichicon conductive-polymer ranges).
+
+**Why polymer:**
+- **Low ESR.** At a 1.5 A step, every 0.1 Ω of ESR costs 0.15 V before any capacitance helps. A general-purpose 100 µF electrolytic has an ESR of roughly 0.5–1 Ω, so it can't hold the rail up.
+- **Cold weather.** A wet electrolytic's ESR rises steeply below 0 °C. A polymer cap's ESR barely changes, which matters for units that stay out through winter.
+- **Life.** There is no liquid electrolyte to dry out in a hot enclosure.
+- **Safe at 5 V with no derating problems.** 16 V gives margin for the voltage spike when a USB cable is plugged in.
+
+**Types to avoid:**
+- **MnO₂ tantalum:** can fail short on the surge current of a hot-plugged battery input, which is a fire risk. It would need about 3× voltage derating.
+- **Ceramic only:** large MLCCs lose most of their capacitance at 5 V DC bias. Their very low ESR also forms an undamped LC circuit with the cable, so plugging in can ring to nearly twice the supply voltage. The polymer cap's ESR damps this.
+- **General-purpose wet electrolytic:** fine for a first bench test, but not for the board (ESR, cold, life).
+
+**Sizing:** a capacitor droops by ΔV = I·t / C while it supplies current. 1000 µF supplying 1.5 A for 200 µs droops 0.3 V. Confirm the size by putting a scope on the WittyPi input during a wake. Use the step current, its length, and the WittyPi's dropout voltage from that capture.
+
+**Where it goes:** across VBUS and GND at the WittyPi **input**. The HAT doesn't see this rail today: its 5 V comes from the 40-pin header, which is the WittyPi's switched **output**. That means either:
+- **A (current units, no PCB change):** put C10–C12 on a small USB-C pass-through board or inline on the Y-adapter, at the WittyPi end.
+- **B (HAT):** add a 5 V power-entry connector on the HAT, fitted with C10–C12, plus a short output lead to the WittyPi USB-C input. The input ground is WittyPi board GND (P3 GND), not Pi ground. Pi ground is CATH, which sits behind the WittyPi's 0.05 Ω current-sense resistor (see section 6). Check how J3-7 GND joins HAT GND before choosing the return path, so the current sensing isn't bypassed.
+
+**Don't add large bulk on the HAT's +5 V rail.** That rail is downstream of the WittyPi switch, so any bulk there adds to the same switch-on step this change is meant to soften. Keep +5 V to local ceramics (C6) until a scope capture shows otherwise.
+
+**Bench test before committing to the PCB:**
+1. Fit the caps across the WittyPi input on a bench unit. A first test can use ten 100 µF 16 V electrolytics in parallel (Adafruit 2193), which gives 1000 µF and about 0.1 Ω combined ESR.
+2. Run the overnight hourly-wake test with the same V50, side-port charging and Y-adapter as the baseline.
+3. Compare the number of wakes whose WittyPi log starts with "power supply newly connected".
+4. Check the V50 doesn't cut out when the cable carrying the uncharged cap is plugged in.
 
 ### ~~9. No I2C Pull-Up Resistors on Board~~ — FIXED
 
