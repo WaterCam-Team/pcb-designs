@@ -31,6 +31,7 @@
 | 17 | Lepton PW_DWN_L unconnected | Low | ✅ Fixed — P18 tied to +3.3V |
 | 18 | Board-level 3.3V rail | Low | ⏸ Deferred — J1 pin 1 now drives +3V3 net for pull-ups |
 | 19 | Bulk capacitance at the WittyPi 5 V input | High | 🔬 Bench test first — see section 19 |
+| 20 | Separate 3.3 V supply for the mDot; Pi-controlled mDot reset | High | 📝 Proposed — see section 20 |
 
 ---
 
@@ -258,6 +259,34 @@ Pick a stocked part that meets the C10 spec (for example from the Panasonic OS-C
 2. Run the overnight hourly-wake test with the same V50, side-port charging and Y-adapter as the baseline.
 3. Compare the number of wakes whose WittyPi log starts with "power supply newly connected".
 4. Check the V50 doesn't cut out when the cable carrying the uncharged cap is plugged in.
+
+### 20. Separate 3.3 V Supply for the mDot
+
+**Problem:** The mDot runs from the WittyPi's P3 3V3 pin, the same rail that powers the WittyPi's microcontroller and RTC. Anything that disturbs the mDot disturbs the WittyPi:
+- On a bench unit with the mDot on jumper wires, touching the mDot cut power to the whole unit. The WittyPi's microcontroller reset and logged "power supply is newly connected", the same signature as a lost input.
+- Lifting the mDot's GND made the mDot reset. Once, the mDot then hung, answering no AT commands, until it was power-cycled.
+- Section 6 already notes the rail isn't meant for the mDot's LoRa transmit peaks (about 127 mA).
+
+**Change:** power the mDot from its own low-dropout regulator (LDO), fed from the always-on 5 V input upstream of the WittyPi's switch. Only ground is shared.
+
+| Ref | Part | Purpose |
+|-----|------|---------|
+| U5 | 3.3 V LDO, ≥ 300 mA, quiescent current ≤ 50 µA, dropout ≤ 300 mV at 300 mA (for example TLV75533P or AP2112K-3.3) | mDot supply, always on |
+| C13 | 1 µF, 10 V, X7R ceramic, 0603, at U5 input | LDO input |
+| C14 | 1 µF, 10 V, X7R ceramic, 0603, at U5 output | LDO stability (check the chosen part's output-cap rule) |
+
+C1 (100 µF) and C2 (100 nF) at the mDot's VDD stay as in section 8, now on U5's output.
+
+**Notes:**
+- **Standby cost:** U5's quiescent current runs around the clock, so keep it low. 50 µA at 5 V is about 6 mWh a day.
+- **Input:** the HAT doesn't see the 5 V input today. Use the same power-entry connector as section 19 option B, or the WittyPi P2 harness (SU-WaterCam `docs/WITTYPI_P2_POWER_HARNESS.md`).
+- **Ground:** return U5 and the mDot to the WittyPi board ground (P3 GND / input ground), as now. Don't route the mDot's supply current through the Pi's ground (CATH), which sits behind the WittyPi's 0.05 Ω current-sense resistor.
+- **J3-2 (WittyPi 3V3):** disconnect it from the mDot. Use it for nothing that draws more than a few mA.
+
+**Pi-controlled mDot reset (same change):** route mDot NRESET to a free Pi GPIO, so the LoRa daemon can restart an mDot that has stopped answering while the Pi is on. The mDot firmware's own watchdog (mDot-AT-firmware, self watchdog) covers a hang while the Pi is off.
+- Drive NRESET through an N-MOSFET (Q2, 2N7002, like Q1), with its gate on the GPIO through 100 Ω and a 10 kΩ pull-down, and its drain on NRESET, which keeps R9's 10 kΩ pull-up to the mDot's 3.3 V.
+- **Don't wire NRESET straight to a GPIO.** With the Pi off, the GPIO's protection diode to the Pi's unpowered 3.3 V rail would pull NRESET low through R9 and hold the mDot in reset, which breaks remote wake. The MOSFET is off when the Pi is off.
+- Suggested GPIO: GPIO25 (pin 22), free in the allocation table.
 
 ### ~~9. No I2C Pull-Up Resistors on Board~~ — FIXED
 
