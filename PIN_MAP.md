@@ -61,7 +61,7 @@ BCM numbering used throughout software (e.g., `gpiozero`, `libgpiod`, `/boot/con
 | 34 | — | GND | GND | — | |
 | 35 | GPIO19 | PCM.FS / SPI1.MISO | — | — | |
 | 36 | GPIO16 | — | BNO055 RST | BNO055 breakout U2 | Active-low reset; hold HIGH normally; pulse LOW to reset IMU |
-| 37 | GPIO26 | — | — | — | |
+| 37 | GPIO26 | — | mDot reset (via Q2) | mDot NRESET (U3 pin 5) | Planned (Schematic_Remaining_Work.md #18): HIGH pulse ~100 ms turns Q2 on and resets the mDot; default pull-down keeps it released |
 | 38 | GPIO20 | PCM.DIN / SPI1.MOSI | BNO055 INT | BNO055 breakout U2 | Interrupt-driven IMU reads; active-low output from BNO055 |
 | 39 | — | GND | GND | — | |
 | 40 | GPIO21 | PCM.DOUT | IR-CUT filter control | NIR optical camera | Driven by `take_nir_photos.py`; HIGH/LOW toggles IR-CUT filter |

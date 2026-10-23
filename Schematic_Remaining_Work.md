@@ -19,10 +19,12 @@
 | 17 | J2-P18 PW_DWN_L not tied | Verify +3V3 tie; add if missing | ✅ Done |
 | 8/15 | Decoupling caps missing | Add C1–C6 (100µF/100nF/10µF) | ✅ Done |
 | ERC | +3V3 net power flag | Add #FLG04 (PWR_FLAG) on +3V3 | ✅ Done |
+| 18 | The Pi can't reset the mDot | Q2 (2N7002) from GPIO26 to NRESET, R10/R11 | ⬜ Open |
+| 19 | mDot debug UART not reachable; mDot TX back-feeds an unpowered Pi | Debug header J4 (PA_9/PA_10/GND); series resistor R12 on the mDot TX | ⬜ Open |
 
 Issues #1–6, #10, #12, #13 are either fixed, N/A, or PCB-layout-only.
 
-**Schematic complete. All issues resolved. Ready for ERC + PCB update.**
+Issues #18 and #19 (added 2026-10-22) are open; the rest of the schematic is complete.
 
 ---
 
@@ -165,6 +167,44 @@ mDot PB_1 ── R8 (100Ω) ─┬─ Q1 Gate
 2. Add a short wire from (121.92, 128.27) going LEFT to ~(113.03, 128.27)
 3. Add `power:+3V3` symbol at (113.03, 128.27)
 4. Add a 10 kΩ pull-up resistor between this +3V3 and the signal for cleaner design (optional; direct tie is acceptable per Issue #17 note in the main change doc)
+
+---
+
+## Issue #18 — Pi-Controlled mDot Reset
+
+**Background:** The mDot runs from the Witty Pi's always-on 3.3 V (J3 pin 2), which the Witty Pi can't switch: its firmware controls only the 5 V output to the Pi. NRESET has only the R9 pull-up. So nothing on the unit can reset a hung mDot; it takes unplugging the Witty Pi's input, which for a deployed unit means a site visit. On a bench unit (2026-10-22) the mDot's bootloader hung during a flash and answered nothing until the unit was unplugged. The bootloader has no watchdog, so this can't be recovered in software. A reset line also makes flashing deterministic: reset, then send `mts` inside the bootloader's short listening window.
+
+**Fix:** An open-drain pull-down on NRESET driven from a spare Pi GPIO, the same arrangement as the remote-start circuit Q1:
+
+| Ref | Part | Connection |
+|-----|------|-----------|
+| Q2 | 2N7002 (SOT-23, as Q1) | Drain → mDot NRESET (U3 pin 5, the R9 net); Source → GND |
+| R10 | 100 Ω | GPIO26 (J1 pin 37) → Q2 gate (as R8 on Q1) |
+| R11 | 100 kΩ | Q2 gate → GND, so Q2 is off while the Pi is off or booting |
+
+GPIO26 is unallocated (PIN_MAP.md) and, like GPIO22–27, defaults to pull-down at power-up, so the line stays released through boot. Software pulses GPIO26 HIGH for about 100 ms to reset the mDot.
+
+**Don't wire a GPIO straight to NRESET** (nor through a diode). With the Pi off, the pin is clamped by its protection diode to the Pi's dead 3.3 V rail, pulling NRESET to roughly 0.6–1 V: the mDot would be held in reset, or nearly, exactly when it must be listening for a remote start. The transistor keeps the Pi's pin out of the always-on domain.
+
+**Optional:** 100 nF from NRESET to GND (the mDot datasheet's recommended filter), if not already fitted.
+
+---
+
+## Issue #19 — mDot Debug UART Header and UART Series Resistors
+
+**Background:**
+1. The mDot's debug UART (PA_9 TX / PA_10 RX, mbed stdio at 115200) carries what the AT port doesn't: the LoRaWAN library's log lines (join attempts, MAC errors) and mbed's fault dump on a crash. It isn't reachable on the board. A crash then looks like silence followed by a watchdog reset, and finding the cause took several diagnostic firmware builds.
+2. The Pi has no free UART for it: UART0 (GPIO14/15) is the serial login console, kept for field debugging; UART2 is on the ID EEPROM pins; UART3 (GPIO4/5) clashes with the Witty Pi and the Pi-alive line; UART4 (GPIO8/9) with the Lepton's SPI; UART5 (GPIO12/13) is the mDot's AT port.
+3. The mDot is always on, so its TX lines drive the Pi's RX pins while the Pi is off, feeding current through the pins' protection diodes into the unpowered Pi.
+
+**Fix:**
+
+| Ref | Part | Connection |
+|-----|------|-----------|
+| J4 | 1×3 0.1" header (or test pads) | mDot PA_9 (debug TX), PA_10 (debug RX), GND — for a 3.3 V USB-serial adapter on the bench |
+| R12 | 1 kΩ–4.7 kΩ | In series in mDot PA_2 (AT TX) → Pi GPIO13 (RXD5), at the Pi end |
+
+The other direction (Pi TXD5 → mDot RX) needs nothing: with the Pi off, only the mDot input's weak pull-up, if enabled, flows into the Pi pin. R12 limits the back-feed current to well under a milliampere and is invisible at 115200 baud. Check the mDot's module pin numbers for PA_9/PA_10 against the MultiTech mDot pinout before routing; this document only gives the STM32 port names.
 
 ---
 
