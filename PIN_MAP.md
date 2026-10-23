@@ -108,7 +108,7 @@ UART interface: `dtoverlay=uart5` in `/boot/config.txt`; serial port `/dev/ttyAM
 
 | mDot Pin | mDot Signal | Connected To | Notes |
 |----------|------------|-------------|-------|
-| 1 | VDD | J3 Pin 2 (WittyPi 3.3 V always-on) | **Not** Pi 3.3 V — survives Pi shutdown |
+| 1 | VDD | J3 Pin 2 (WittyPi 3.3 V always-on) | **Not** Pi 3.3 V — survives Pi shutdown. Planned change: always-on battery 5 V through a Schottky (Schematic_Remaining_Work.md #20) |
 | 2 | PA_2 (UART TX) | GPIO13 / RXD5 (Pi pin 33) | mDot transmits → Pi receives |
 | 3 | PA_3 (UART RX) | GPIO12 / TXD5 (Pi pin 32) | mDot receives ← Pi transmits |
 | 10 | GND | J3 Pin 7 (WittyPi GND) | |
