@@ -19,10 +19,13 @@
 | 17 | J2-P18 PW_DWN_L not tied | Verify +3V3 tie; add if missing | ✅ Done |
 | 8/15 | Decoupling caps missing | Add C1–C6 (100µF/100nF/10µF) | ✅ Done |
 | ERC | +3V3 net power flag | Add #FLG04 (PWR_FLAG) on +3V3 | ✅ Done |
+| 18 | The Pi can't reset the mDot | Q2 (2N7002) from GPIO26 to NRESET, R10/R11 | ⬜ Open |
+| 19 | mDot debug UART not reachable; mDot TX back-feeds an unpowered Pi | Debug header J4 (PA_9/PA_10/GND); series resistor R12 on the mDot TX | ⬜ Open |
+| 20 | mDot powered from the Witty Pi's MCU rail, at the bottom of its supply range | Feed U3 VDD from always-on battery 5 V (J5) through a Schottky diode | ⬜ Open |
 
 Issues #1–6, #10, #12, #13 are either fixed, N/A, or PCB-layout-only.
 
-**Schematic complete. All issues resolved. Ready for ERC + PCB update.**
+Issues #18–#20 (added 2026-10-22) are open; the rest of the schematic is complete.
 
 ---
 
@@ -165,6 +168,71 @@ mDot PB_1 ── R8 (100Ω) ─┬─ Q1 Gate
 2. Add a short wire from (121.92, 128.27) going LEFT to ~(113.03, 128.27)
 3. Add `power:+3V3` symbol at (113.03, 128.27)
 4. Add a 10 kΩ pull-up resistor between this +3V3 and the signal for cleaner design (optional; direct tie is acceptable per Issue #17 note in the main change doc)
+
+---
+
+## Issue #18 — Pi-Controlled mDot Reset
+
+**Background:** The mDot runs from the Witty Pi's always-on 3.3 V (J3 pin 2), which the Witty Pi can't switch: its firmware controls only the 5 V output to the Pi. NRESET has only the R9 pull-up. So nothing on the unit can reset a hung mDot; it takes unplugging the Witty Pi's input, which for a deployed unit means a site visit. On a bench unit (2026-10-22) the mDot's bootloader hung during a flash and answered nothing until the unit was unplugged. The bootloader has no watchdog, so this can't be recovered in software. A reset line also makes flashing deterministic: reset, then send `mts` inside the bootloader's short listening window.
+
+**Fix:** An open-drain pull-down on NRESET driven from a spare Pi GPIO, the same arrangement as the remote-start circuit Q1:
+
+| Ref | Part | Connection |
+|-----|------|-----------|
+| Q2 | 2N7002 (SOT-23, as Q1) | Drain → mDot NRESET (U3 pin 5, the R9 net); Source → GND |
+| R10 | 100 Ω | GPIO26 (J1 pin 37) → Q2 gate (as R8 on Q1) |
+| R11 | 100 kΩ | Q2 gate → GND, so Q2 is off while the Pi is off or booting |
+
+GPIO26 is unallocated (PIN_MAP.md) and, like GPIO22–27, defaults to pull-down at power-up, so the line stays released through boot. Software pulses GPIO26 HIGH for about 100 ms to reset the mDot.
+
+**Don't wire a GPIO straight to NRESET** (nor through a diode). With the Pi off, the pin is clamped by its protection diode to the Pi's dead 3.3 V rail, pulling NRESET to roughly 0.6–1 V: the mDot would be held in reset, or nearly, exactly when it must be listening for a remote start. The transistor keeps the Pi's pin out of the always-on domain.
+
+**Optional:** 100 nF from NRESET to GND (the mDot datasheet's recommended filter), if not already fitted.
+
+---
+
+## Issue #19 — mDot Debug UART Header and UART Series Resistors
+
+**Background:**
+1. The mDot's debug UART (PA_9 TX / PA_10 RX, mbed stdio at 115200) carries what the AT port doesn't: the LoRaWAN library's log lines (join attempts, MAC errors) and mbed's fault dump on a crash. It isn't reachable on the board. A crash then looks like silence followed by a watchdog reset, and finding the cause took several diagnostic firmware builds.
+2. The Pi has no free UART for it: UART0 (GPIO14/15) is the serial login console, kept for field debugging; UART2 is on the ID EEPROM pins; UART3 (GPIO4/5) clashes with the Witty Pi and the Pi-alive line; UART4 (GPIO8/9) with the Lepton's SPI; UART5 (GPIO12/13) is the mDot's AT port.
+3. The mDot is always on, so its TX lines drive the Pi's RX pins while the Pi is off, feeding current through the pins' protection diodes into the unpowered Pi.
+
+**Fix:**
+
+| Ref | Part | Connection |
+|-----|------|-----------|
+| J4 | 1×3 0.1" header (or test pads) | mDot PA_9 (debug TX), PA_10 (debug RX), GND — for a 3.3 V USB-serial adapter on the bench |
+| R12 | 1 kΩ–4.7 kΩ | In series in mDot PA_2 (AT TX) → Pi GPIO13 (RXD5), at the Pi end |
+
+The other direction (Pi TXD5 → mDot RX) needs nothing: with the Pi off, only the mDot input's weak pull-up, if enabled, flows into the Pi pin. R12 limits the back-feed current to well under a milliampere and is invisible at 115200 baud. Check the mDot's module pin numbers for PA_9/PA_10 against the MultiTech mDot pinout before routing; this document only gives the STM32 port names.
+
+---
+
+## Issue #20 — Power the mDot from the Battery's 5 V
+
+**Background:**
+1. **The mDot is at the bottom of its supply range.** The mDot takes 3.3–5 V (±5%) and makes its own 3.0 V with an onboard LDO. MultiTech requires at least 3.3 V "to maintain certification and to help protect the SPI Flash file system", and the firmware refuses SPI flash access when the LDO's output drops below 3 V (mDot Developer Guide, Specifications). On the Witty Pi's 3V3 the mDot gets exactly the minimum, so any sag during a transmission leaves its LDO short of 3 V. The flash-access failures seen on 005 (user files unreadable, `AT&W` "Failed to save to flash") followed bootloader visits and probably have a software cause, but a marginal supply can't be ruled out.
+2. **It loads a rail that isn't meant for it.** The Witty Pi manual describes 3V3 as the rail that "powers the micro controller, RTC and temperature sensor"; its current rating isn't published. The mDot draws 32 mA idle, 43 mA receiving (Class C listens continuously), 130 mA transmitting at TXP 20 and up to 250 mA (Developer Guide, electrical characteristics). A sag on that rail during a transmission would also hit the Witty Pi's microcontroller and RTC, which hold the wake schedule and switch the Pi.
+3. **The Witty Pi can't switch it** (see #18), and P3 has no always-on 5 V: its VOUT is the switched output to the Pi.
+
+**Fix:**
+
+| Ref | Part | Connection |
+|-----|------|-----------|
+| J5 | 2-pin JST-PH (or similar) | Always-on 5 V and GND from the battery, as a third branch of the cable that feeds the Witty Pi's input |
+| D1 | Schottky, ≥ 500 mA (e.g. SS14 / B5819W) | J5 5 V → U3 VDD |
+| C7 | 10 µF + 100 nF | At U3 VDD, for the transmit current steps |
+
+U3 VDD then leaves the Witty Pi's 3V3 (J3 pin 2). The NRESET pull-up R9 moves with it to U3 VDD (or is dropped: the mDot has an internal pull-up). The ground stays the battery/Witty Pi ground (J3 pin 7), as now; the Witty Pi switches the Pi on its low side (CATHODE), so this is not the Pi's ground while the Pi is off.
+
+D1 gives margin under the 5.25 V maximum (a USB source can sit at 5.1–5.2 V with no load), blocks back-feed, and still leaves about 4.7 V, well above the 3.3 V minimum. The mDot's I/O stays at 3.0 V logic, so the UART, PA_6 and PB_1 connections are unchanged.
+
+**Energy:** the same battery feeds both paths. If the Witty Pi's 3V3 comes from an LDO, the battery current is the same either way; if it comes from a switching regulator, the direct feed costs up to about a third more in the mDot's share. Measure before deciding. A USB meter on the Witty Pi feed hasn't resolved the off-state draw (below about 10 mA, 0.05 W). A multimeter in series with U3 VDD would, and should be checked against the datasheet's 43 mA continuous receive: at 5 V that would be about 5 Wh/day, more than the power analysis assumes for the whole off state.
+
+**Optional, with #18:** a load switch on this feed (e.g. TPS22918), enabled by default through a pull-up to J5 and turned off by a transistor from a Pi GPIO, would allow a full power cycle of the mDot, radio included. NRESET (#18) is simpler and covers a hung processor or bootloader.
+
+**Checks on a hand-wired unit before the board** (measurements only, no wiring change): the voltage at the mDot's VDD while idle and during a transmission at the deployed power, ideally on an oscilloscope; and the mDot's current in receive.
 
 ---
 

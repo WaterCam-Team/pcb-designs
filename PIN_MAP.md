@@ -61,7 +61,7 @@ BCM numbering used throughout software (e.g., `gpiozero`, `libgpiod`, `/boot/con
 | 34 | — | GND | GND | — | |
 | 35 | GPIO19 | PCM.FS / SPI1.MISO | — | — | |
 | 36 | GPIO16 | — | BNO055 RST | BNO055 breakout U2 | Active-low reset; hold HIGH normally; pulse LOW to reset IMU |
-| 37 | GPIO26 | — | — | — | |
+| 37 | GPIO26 | — | mDot reset (via Q2) | mDot NRESET (U3 pin 5) | Planned (Schematic_Remaining_Work.md #18): HIGH pulse ~100 ms turns Q2 on and resets the mDot; default pull-down keeps it released |
 | 38 | GPIO20 | PCM.DIN / SPI1.MOSI | BNO055 INT | BNO055 breakout U2 | Interrupt-driven IMU reads; active-low output from BNO055 |
 | 39 | — | GND | GND | — | |
 | 40 | GPIO21 | PCM.DOUT | IR-CUT filter control | NIR optical camera | Driven by `take_nir_photos.py`; HIGH/LOW toggles IR-CUT filter |
@@ -108,7 +108,7 @@ UART interface: `dtoverlay=uart5` in `/boot/config.txt`; serial port `/dev/ttyAM
 
 | mDot Pin | mDot Signal | Connected To | Notes |
 |----------|------------|-------------|-------|
-| 1 | VDD | J3 Pin 2 (WittyPi 3.3 V always-on) | **Not** Pi 3.3 V — survives Pi shutdown |
+| 1 | VDD | J3 Pin 2 (WittyPi 3.3 V always-on) | **Not** Pi 3.3 V — survives Pi shutdown. Planned change: always-on battery 5 V through a Schottky (Schematic_Remaining_Work.md #20) |
 | 2 | PA_2 (UART TX) | GPIO13 / RXD5 (Pi pin 33) | mDot transmits → Pi receives |
 | 3 | PA_3 (UART RX) | GPIO12 / TXD5 (Pi pin 32) | mDot receives ← Pi transmits |
 | 10 | GND | J3 Pin 7 (WittyPi GND) | |
